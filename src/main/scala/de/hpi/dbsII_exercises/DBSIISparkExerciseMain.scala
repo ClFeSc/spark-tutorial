@@ -1,8 +1,12 @@
 package de.hpi.dbsII_exercises
 
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 
 object DBSIISparkExerciseMain extends App{
+  // Turn off logging as this clutters up the prints that we will do
+  Logger.getLogger("org").setLevel(Level.OFF)
+  Logger.getLogger("akka").setLevel(Level.OFF)
 
   val pathToData = args(0)
   val numCores = args(1).toInt
@@ -25,12 +29,12 @@ object DBSIISparkExerciseMain extends App{
   val res3a = new Exercise_3a(spark,changeRecords).execute()
   val res3b = new Exercise_3b(spark,changeRecords).execute()
   val res3c = new Exercise_3c(spark,changeRecords).execute()
-  val res3d = new Exercise_3d(spark,changeRecords).execute()
+//  val res3d = new Exercise_3d(spark,changeRecords).execute()
 
   val resultChecker = new ResultChecker(spark)
   resultChecker.checkExercise1Result(res3a,"data/exercise1.csv")
   resultChecker.checkExercise2Result(res3b,"data/exercise2.csv")
   resultChecker.checkExercise3Result(res3c,"data/exercise3.json")
-  resultChecker.checkExercise4Result(res3d,"data/exercise4.json")
+//  resultChecker.checkExercise4Result(res3d,"data/exercise4.json")
 
 }

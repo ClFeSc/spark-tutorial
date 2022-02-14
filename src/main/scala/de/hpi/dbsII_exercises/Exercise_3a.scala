@@ -16,6 +16,10 @@ class Exercise_3a(spark: SparkSession, changeRecords: Dataset[ChangeRecord]){
    * @return sorted sequence of all table ids
    */
   def execute():Seq[String] = {
-    ???
+    changeRecords
+      .map(record => record.tableID)
+      .dropDuplicates()
+      .sort("value")
+      .collect()
   }
 }
