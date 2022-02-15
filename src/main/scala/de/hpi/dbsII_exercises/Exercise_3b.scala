@@ -16,7 +16,11 @@ class Exercise_3b(spark: SparkSession, changeRecords: Dataset[ChangeRecord]) {
    * @return A Map that maps a table-id (key) to the number of attributes of the corresponding table (value)
    */
   def execute():Map[String,Int] = {
-    ???
+    changeRecords
+      .groupByKey(record => record.tableID)
+      .mapGroups((tableId, changeRecordsIt) => {
+        tableId -> changeRecordsIt.toSeq.map(changeRecord => changeRecord.attributeName).distinct.size
+    }).collect().toMap
   }
 
 }

@@ -24,7 +24,12 @@ class Exercise_3c(spark: SparkSession, changeRecords: Dataset[ChangeRecord]) {
    *         That means for all values v in the returned map, the following must hold: v.size > 1.
    */
   def execute():Map[(String,String,Int,Timestamp),Seq[String]] = {
-    ???
+    changeRecords.groupByKey(changeRecord => (changeRecord.tableID, changeRecord.attributeName, changeRecord.entityID, changeRecord.timestamp))
+      .mapGroups((key, changeRecordsIt) => {
+        val valuesIt = changeRecordsIt.map(changeRecord => changeRecord.newValue)
+        key -> valuesIt.toSeq
+      }).filter(group => group._2.size > 1)
+      .collect().toMap
   }
 
 }
