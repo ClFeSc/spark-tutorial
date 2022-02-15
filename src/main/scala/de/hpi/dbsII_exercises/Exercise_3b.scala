@@ -19,12 +19,7 @@ class Exercise_3b(spark: SparkSession, changeRecords: Dataset[ChangeRecord]) {
     changeRecords
       .groupByKey(record => record.tableID)
       .mapGroups((tableId, changeRecordsIt) => {
-        val all = new scala.collection.mutable.ListBuffer[String]()
-        while (changeRecordsIt.hasNext){
-          val currentAttributeName = changeRecordsIt.next().attributeName
-          all.append(currentAttributeName)
-        }
-        (tableId -> all.distinct.size)
+        tableId -> changeRecordsIt.toSeq.map(changeRecord => changeRecord.attributeName).distinct.size
     }).collect().toMap
   }
 

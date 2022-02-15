@@ -23,7 +23,26 @@ class Exercise_3d(spark: SparkSession, changeRecords: Dataset[ChangeRecord]) {
    *         Value: a sequence of all attributes (represented as tuples in the form of (tableID,attrID) ), that belong to this change-signature
    */
   def execute():Map[Seq[Timestamp],Seq[(String,String)]] = {
-    ???
+    // Source: https://stackoverflow.com/a/29986300
+    implicit def ordered: Ordering[Timestamp] = new Ordering[Timestamp] {
+      def compare(x: Timestamp, y: Timestamp): Int = x compareTo y
+    }
+    changeRecords
+      .groupByKey(changeRecord => (changeRecord.tableID, changeRecord.attributeName, changeRecord.timestamp))
+      .mapValues(changeRecord => changeRecord.entityID)
+      .mapGroups((key, entityIt) => {
+        (key._1, key._2, key._3, entityIt.toSeq)
+      })
+      .filter(_._4.distinct.size >= 100)
+      .groupByKey(item => (item._1, item._2))
+      .mapValues(_._3)
+      .mapGroups((key, timestampIt) => {
+        (key._1, key._2, timestampIt.toSeq.sorted)
+      })
+      .map(item => (item._1, item._2, item._3))
+      .groupByKey(_._3)
+      .mapValues(item => (item._1, item._2))
+      .mapGroups(_ -> _.toSeq).collect.toMap
   }
 
 }
